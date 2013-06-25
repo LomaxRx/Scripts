@@ -33,7 +33,7 @@ addCode = function(j, a){
     }
  }
 
-gCode = function(address,filename="GeoCodedAdds.csv",verbose=FALSE){
+gCode = function(address,verbose=FALSE){
 	
     address[c("lat","long","hood")] = NA
     OQLs = 0
@@ -73,7 +73,7 @@ gCode = function(address,filename="GeoCodedAdds.csv",verbose=FALSE){
 	            } 
 
 	            if (success == FALSE) { 
-	            	print("Geocoding stopped at iterant #" + i + " " + thisAddress$address + " OVER_QUERY_LIMIT")
+	            	print("Geocoding stopped by OVER_QUERY_LIMIT error")
 	            	break 
 	            }      
 			} 
@@ -81,8 +81,7 @@ gCode = function(address,filename="GeoCodedAdds.csv",verbose=FALSE){
     }
 	
 
-	write.csv(address, "H:/Projects/FY13\ Mapping/" + filename)
-	print("OQLs: " + OQLs)
+	write.csv(address, "H:/Projects/FY13\ Mapping/GeocodedAdds.csv")
 	return(address)
 
 }
