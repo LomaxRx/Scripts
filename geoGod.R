@@ -31,12 +31,15 @@ addCode = function(j, a){
 	if(length(hood) >= 3){
 		a$hood = hood[[3]]$long_name
     }
+
+    return(a)
  }
 
 gCode = function(address,verbose=FALSE){
 	
     address[c("lat","long","hood")] = NA
     OQLs = 0
+    errs = 0
 
 	for (i in 1:nrow(address)) {
 		thisAddress = address[i, ]     
@@ -52,7 +55,8 @@ gCode = function(address,verbose=FALSE){
 			x = fromJSON(son,simplify=FALSE)
 		
 			if(x$status=="OK"){
-				addCode(x, thisAddress)
+				thisAddress = addCode(x, thisAddress)			
+				
 
 			} else if (x$status=="OVER_QUERY_LIMIT") {
 			    success = FALSE
@@ -65,7 +69,7 @@ gCode = function(address,verbose=FALSE){
 	            		x = fromJSON(son,simplify=FALSE)
 	            		
 	            		if(x$status == "OK"){
-	            			addCode(x,thisAddress)
+	            			thisAddress = addCode(x,thisAddress)
 	            			success = TRUE
 	            			break
 	            		}
@@ -73,16 +77,23 @@ gCode = function(address,verbose=FALSE){
 	            } 
 
 	            if (success == FALSE) { 
-	            	print("Geocoding stopped by OVER_QUERY_LIMIT error")
+	            	cat("Geocoding stopped by OVER_QUERY_LIMIT error")
 	            	break 
 	            }      
-			} 
+			} else { errs = errs + 1 }
 		}
-    }
-	
+    
+    	address[i,]$lat = thisAddress$lat
+    	address[i,]$long = thisAddress$long
+    	address[i,]$hood = thisAddress$hood
 
+    }
+
+	cat("Errors:", errs, "\n")
+    cat("OQLs: ", OQLs)
 	write.csv(address, "H:/Projects/FY13\ Mapping/GeocodedAdds.csv")
 	return(address)
 
 }
+
 
