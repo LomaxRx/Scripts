@@ -1,0 +1,44 @@
+Sub AddressClean()
+    
+    Dim invalids() As String
+    invalids() = Split(",|:|1/2|c/o|/|\|(|)|#|.|{|}|+|[|]|=|-|_|^|%|$|@|!|~~|~*|~?|""|`|'|<|>|;", "|", -1, vbBinaryCompare)
+
+   
+   For Each cell In Selection
+        If Not IsEmpty(cell) And Not Left(cell.Value, 3) = "Apt" Then
+            cell.Value = Split(cell.Value, "Apt", -1, CompareMethod.Text)(0)
+            cell.Value = Split(cell.Value, "#", -1, CompareMethod.Text)(0)
+        End If
+        
+        If InStr(1, UCase(cell.Value), "HOMELESS") > 0 Then
+            cell.Value = ""
+        End If
+
+        If InStr(1, UCase(cell.Value), "1525 7TH") > 0 Then
+            cell.Value = ""
+        End If
+            
+        If InStr(1, UCase(cell.Value), " NW") = 0 And InStr(1, UCase(cell.Value), " NE") = 0 _
+         And InStr(1, UCase(cell.Value), " SE") = 0 And InStr(1, UCase(cell.Value), " SW") = 0 _
+         And Not IsEmpty(cell) Then
+            cell.Value = cell.Value & " " & Cells(cell.Row, cell.Column + 1).Value
+        End If
+         
+   Next cell
+   
+   For i = LBound(invalids) To UBound(invalids)
+        Selection.Replace What:=invalids(i), Replacement:=" ", LookAt:=xlPart, _
+            SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+            ReplaceFormat:=False
+    Next i
+
+
+        Selection.Replace What:="&", Replacement:=" and ", LookAt:=xlPart, _
+            SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+            ReplaceFormat:=False
+
+        Selection.Replace What:="  ", Replacement:=" ", LookAt:=xlPart, _
+            SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+            ReplaceFormat:=False
+        
+End Sub
